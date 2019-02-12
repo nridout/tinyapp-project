@@ -12,69 +12,15 @@
 </head>
 
 <body style="font-size:20px; padding:50px;">
-  <style type="text/css">
-    .tg {
-      border-collapse: collapse;
-      border-spacing: 0;
-      border-color: #ccc;
-    }
-
-    .tg td {
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      padding: 10px 5px;
-      border-style: solid;
-      border-width: 1px;
-      overflow: hidden;
-      word-break: normal;
-      border-color: #ccc;
-      color: #333;
-      background-color: #fff;
-    }
-
-    .tg th {
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      font-weight: normal;
-      padding: 10px 5px;
-      border-style: solid;
-      border-width: 1px;
-      overflow: hidden;
-      word-break: normal;
-      border-color: #ccc;
-      color: #333;
-      background-color: #f0f0f0;
-    }
-
-    .tg .tg-baqh {
-      text-align: center;
-      vertical-align: top
-    }
-
-    .tg .tg-0lax {
-      text-align: left;
-      vertical-align: top
-    }
-  </style>
 
 <header>
   <% include ./partials/_header %>
 </header>
-
-  <br>
-
-  <table class="tg">
-    <tr>
-      <th class="tg-baqh">Biggy</th>
-      <th class="tg-baqh">Shorty</th>
-    </tr>
-    <tr>
-      <td class="tg-0lax"><%= longURL %></td>
-      <td class="tg-0lax"><%= shortURL %></td>
-    </tr>
-  </table>
-  <br>
   <h4><a href='#'>Make New Shorty</a></h4>
+  <br>
+  <h4><%= longURL %></h4>
+  <h6><b>My Shorty:</b> <%= shortURL %></h6>
+
 </body>
 
 </html>
