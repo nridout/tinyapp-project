@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/nridout/tinyapp-project/issues"
   },
-  "homepage": "https://github.com/nridout/tinyapp-project#readme"
+  "homepage": "https://github.com/nridout/tinyapp-project#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
 }
