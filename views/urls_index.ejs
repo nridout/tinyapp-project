@@ -44,7 +44,11 @@
   <tr>
     <td style="padding: 10px 10px 10px 0px;"><%= urls[shortURL] %></td>
     <td><%= shortURL %></td>
-    <td><form method="POST" action="/urls/9sm5xK/delete"></form><button type="button" class="btn btn-dark">Delete</button></td>
+    <td>
+      <form method="POST" action="/urls/9sm5xK/delete">
+      <button type="submit" class="btn btn-dark">Delete</button>
+      </form>
+    </td>
   </tr>
   <% }; %>
 </table>

@@ -67,6 +67,12 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.post("/urls/:shortURL/delete", (req, res) => {
+  // delete req.params.shortURL;
+  console.log("deleted");
+  res.redirect("/urls");
+});
+
 // function that generates a random string for the short url
 function generateRandomString() {
   return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
