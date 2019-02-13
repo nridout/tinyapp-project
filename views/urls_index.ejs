@@ -21,37 +21,14 @@
 
   .tg td {
     font-family: Arial, sans-serif;
-    font-size: 14px;
-    padding: 10px 5px;
-    border-style: solid;
-    border-width: 1px;
+    font-size: 18px;
+    padding: 10px;
     overflow: hidden;
     word-break: normal;
     border-color: #ccc;
     color: #333;
     background-color: #fff;
-  }
-
-  .tg th {
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    font-weight: normal;
-    padding: 10px 5px;
-    border-style: solid;
-    border-width: 1px;
-    overflow: hidden;
-    word-break: normal;
-    border-color: #ccc;
-    color: #333;
-    background-color: #f0f0f0;
-  }
-  .tg .tg-baqh {
-    text-align:center;
-    vertical-align:top
-    }
-  .tg .tg-0lax {
     text-align: left;
-    vertical-align: top
   }
 </style>
 
@@ -60,17 +37,17 @@
 </header>
 <h4><a href='/urls/new'>Make New Shorty</a></h4>
 <br>
-<h5>My Shorties</h5>
+<h4>My Shorties</h4>
 <table class="tg">
   </tr>
   <% for (shortURL in urls) { %>
   <tr>
-    <td class="tg-0lax"><%= urls[shortURL] %></td>
-    <td class="tg-0lax"><%= shortURL %></td>
+    <td style="padding: 10px 10px 10px 0px;"><%= urls[shortURL] %></td>
+    <td><%= shortURL %></td>
+    <td><form method="POST" action="/urls/9sm5xK/delete"></form><button type="button" class="btn btn-dark">Delete</button></td>
   </tr>
   <% }; %>
 </table>
-  <br>
 
 </body>
 
