@@ -8,56 +8,50 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
     integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-  <title>TinyApp</title>
+  <title>TinyApp - View All</title>
 </head>
 
 <body style="font-size:20px; padding:50px;">
-<style type="text/css">
-  .tg {
-    border-collapse: collapse;
-    border-spacing: 0;
-    border-color: #ccc;
-  }
 
-  .tg td {
-    font-family: Arial, sans-serif;
-    font-size: 18px;
-    padding: 10px;
-    overflow: hidden;
-    word-break: normal;
-    border-color: #ccc;
-    color: #333;
-    background-color: #fff;
-    text-align: left;
-  }
-</style>
 
 <header>
   <% include ./partials/_header %>
 </header>
-<h4><a href='/urls/new'>Make New Shorty</a></h4>
+
 <br>
-<h4>My Shorties</h4>
-<table class="tg">
-  </tr>
+<h4>My TinyURLs</h4>
+<br>
+
+<table class="table">
+  <thead class="thead-light">
+    <tr>
+      <th scope="col">URL</th>
+      <th scope="col">TinyURL</th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
   <% for (shortURL in urls) { %>
-  <tr>
-    <td style="padding: 10px 10px 10px 0px;"><a href="<%= urls[shortURL] %>"><%= urls[shortURL] %></a></td>
-    <td><a href="http://localhost:3000/u/<%= shortURL %>"><%= shortURL %></a></td>
-    <td>
-      <a class="btn btn-light" href="http://localhost:3000/urls/<%= shortURL %>" role="button">Edit</a>
-      </form>
-    </td>
-    <td>
-      <form method="POST" action="/urls/<%=shortURL%>/delete">
-      <button type="submit" class="btn btn-dark">Delete</button>
-      </form>
-    </td>
-  </tr>
+    <tr>
+      <td>
+        <a href="<%= urls[shortURL] %>"><%= urls[shortURL] %></a>
+      </td>
+      <td>
+        <a href="http://localhost:3000/u/<%= shortURL %>"><%= shortURL %></a>
+      </td>
+      <td>
+        <a class="btn btn-light" href="http://localhost:3000/urls/<%= shortURL %>" role="button">Edit</a>
+      </td>
+      <td>
+        <form method="POST" action="/urls/<%=shortURL%>/delete">
+        <button type="submit" class="btn btn-dark">Delete</button>
+        </form>
+      </td>
+    </tr>
   <% }; %>
 </table>
 
 </body>
 
 </html>
-
