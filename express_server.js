@@ -5,8 +5,8 @@ var PORT = 3000; // default port 3000 because 8080 isn't working for me
 app.set("view engine", "ejs")
 
 var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b2xVn2: 'http://www.lighthouselabs.ca',
+  '9sm5xK': 'http://www.google.com',
 };
 
 const bodyParser = require("body-parser");
@@ -32,6 +32,11 @@ app.post("/urls", (req, res) => {
   urlDatabase[randomString] = longURL;
   var redirectRandom = "/urls/" + randomString;
   res.redirect(redirectRandom);
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL]; //??
+  res.redirect(longURL);
 });
 
 app.get("/urls/new", (req, res) => {
