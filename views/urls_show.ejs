@@ -18,9 +18,10 @@
 </header>
   <h4><a href='/urls/new'>Make New Shorty</a></h4>
   <br>
-  <h4><%= longURL %></h4>
-  <h6><b>My Shorty:</b> <%= shortURL %></h6>
-
+  <h4><a href="<%= longURL %>"><%= longURL %></a></h4>
+  <h6><b>My Shorty:</b> <a href="http://localhost:3000/u/<%= shortURL %>"><%= shortURL %></a></h6>
+  <br>
+  <h6><a href="/urls">View All Shorties</a></h6>
 </body>
 
 </html>

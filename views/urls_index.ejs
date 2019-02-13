@@ -42,10 +42,10 @@
   </tr>
   <% for (shortURL in urls) { %>
   <tr>
-    <td style="padding: 10px 10px 10px 0px;"><%= urls[shortURL] %></td>
-    <td><%= shortURL %></td>
+    <td style="padding: 10px 10px 10px 0px;"><a href="<%= urls[shortURL] %>"><%= urls[shortURL] %></a></td>
+    <td><a href="http://localhost:3000/u/<%= shortURL %>"><%= shortURL %></a></td>
     <td>
-      <form method="POST" action="/urls/9sm5xK/delete">
+      <form method="POST" action="/urls/<%=shortURL%>/delete">
       <button type="submit" class="btn btn-dark">Delete</button>
       </form>
     </td>

@@ -8,10 +8,11 @@ app.set("view engine", "ejs")
 
 // url Database including original url and shortened url key
 var urlDatabase = {
-  b2xVn2: 'http://www.lighthouselabs.ca',
-  '9sm5xK': 'http://www.google.com',
+  '4cef9b': 'http://www.lighthouselabs.ca',
+  '5ce85d': 'http://www.test.ca',
+  '1a4aa5': 'http://www.google.ca',
 };
-
+// ******is this still necessary????*****
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
@@ -52,7 +53,7 @@ app.post("/urls", (req, res) => {
 // redirects the long URL to the short URL
 // when the unique key is added to the /u/ path
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]; //??
+  const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
 
@@ -68,8 +69,7 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  // delete req.params.shortURL;
-  console.log("deleted");
+  delete(urlDatabase[req.params.shortURL]);
   res.redirect("/urls");
 });
 
