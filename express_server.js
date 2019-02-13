@@ -26,6 +26,22 @@ app.use(cookieParser())
 
 // ROUTES
 
+// --- LOGIN
+
+app.post("/login", (req, res) => {
+  let username = req.body.username
+  res.cookie("username", username)
+  res.redirect("/urls")
+})
+
+// --- LOGOUT
+
+app.post("/logout", (req, res) => {
+  let username = req.body.username
+  res.clearCookie("username", username)
+  res.redirect("/urls")
+})
+
 // ---ROOT HOMEPAGE
 
 // sets the template for the root (homepage)
@@ -33,21 +49,15 @@ app.get("/", (req, res) => {
   res.redirect("/urls/new")
 })
 
-// --- LOGIN
-
-// sets the template for the root (homepage)
-app.post("/login", (req, res) => {
-  let username = req.body.username
-  res.cookie('username', username);
-  res.redirect("/urls")
-})
-
 // ---URL LIST
 
 // sets the template for the list of all long & short urls
 // exports the database info to the template
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase }
+  let templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase
+  }
   res.render("urls_index", templateVars)
 })
 
@@ -72,14 +82,21 @@ function generateRandomString() {
 
 // sets the template for the short URL generation page
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new")
+  let templateVars = {
+    username: req.cookies["username"]
+  }
+  res.render("urls_new", templateVars)
 })
 
 // ---URL ID PAGE
 
 // sets the template for the unique id short URL page
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]}
+  let templateVars = {
+    username: req.cookies["username"],
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL]
+  }
   res.render("urls_show", templateVars)
 })
 
