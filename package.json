@@ -4,6 +4,7 @@
   "description": "Web app that allows users to shorten urls",
   "main": "index.js",
   "scripts": {
+    "start": "./node_modules/.bin/nodemon -L express_server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -14,7 +15,7 @@
     "url",
     "shortener"
   ],
-  "author": "Nicole Ridout",
+  "author": "Nicole Ridout: nicole.ridout@gmail.com",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/nridout/tinyapp-project/issues"

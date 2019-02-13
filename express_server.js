@@ -12,6 +12,10 @@ var urlDatabase = {
   '9sm5xK': 'http://www.google.com',
 };
 
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
+});
+
 // formats the response from the original url submission
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
