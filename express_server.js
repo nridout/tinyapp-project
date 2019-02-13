@@ -33,6 +33,15 @@ app.get("/", (req, res) => {
   res.redirect("/urls/new")
 })
 
+// --- LOGIN
+
+// sets the template for the root (homepage)
+app.post("/login", (req, res) => {
+  let username = req.body.username
+  res.cookie('username', username);
+  res.redirect("/urls")
+})
+
 // ---URL LIST
 
 // sets the template for the list of all long & short urls
