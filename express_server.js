@@ -65,7 +65,7 @@ app.get("/urls/new", (req, res) => {
 
 // sets the template for the unique id short URL page
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] }
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]}
   res.render("urls_show", templateVars)
 })
 
@@ -76,12 +76,11 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 })
 
 // reassigns shorty to a new url
-app.post("/urls/:shortURL/update", (req, res) => {
+app.post("/urls/:id", (req, res) => {
+  let shortURL = req.params.id
   let longURL = req.body.longURL
-  let shortURL = req.params.shortURL
   urlDatabase[shortURL] = longURL
-  console.log(urlDatabase)
-  res.redirect('/urls/' + shortURL)
+  res.redirect(shortURL)
 });
 
 // ---SHORT URL REDIRECT
