@@ -1,8 +1,10 @@
 // import express, the web application framework
 const express = require("express")
 const bodyParser = require("body-parser")
+const cookieParser = require('cookie-parser')
 const app = express()
 const PORT = 3000 // default port 3000 because 8080 isn't working for me
+
 
 // sets the view engine to ejs, a templating language that generates HTML markup with plain JavaScript
 app.set("view engine", "ejs")
@@ -18,6 +20,9 @@ var urlDatabase = {
 
 // formats the response from the original url submission
 app.use(bodyParser.urlencoded({ extended: true }))
+
+// Parse Cookie header and populate req.cookies with an object keyed by the cookie names
+app.use(cookieParser())
 
 // ROUTES
 
