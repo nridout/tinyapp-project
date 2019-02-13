@@ -12,47 +12,26 @@
 </head>
 
 <body style="font-size:20px; padding:50px;">
-<style type="text/css">
-  .tg {
-    border-collapse: collapse;
-    border-spacing: 0;
-    border-color: #ccc;
-  }
-
-  .tg td {
-    font-family: Arial, sans-serif;
-    font-size: 18px;
-    padding: 10px;
-    overflow: hidden;
-    word-break: normal;
-    border-color: #ccc;
-    color: #333;
-    background-color: #fff;
-    text-align: left;
-  }
-</style>
 
 <header>
   <% include ./partials/_header %>
 </header>
   <h4><a href='/urls/new'>Make New Shorty</a></h4>
   <br>
-  <h4>My Shorties</h4>
-  <table class="tg">
 
-  </tr>
-    <td style="padding: 10px 10px 10px 0px;"><a href="<%= longURL %>"><%= longURL %></a></td>
-    <td><a href="http://localhost:3000/u/<%= shortURL %>"><%= shortURL %></a></td>
+  <h3>Shorty: <a href="http://localhost:3000/u/<%= shortURL %>"><%= shortURL %></a></h3>
+    <form class="form-inline" action="/urls" method="POST">
+      <div class="form-group mb-2">
+        <input class="form-control" type="text" name="longURL" placeholder="<%= longURL %>" style="width: 300px; margin: 1em; margin-left: 0">
+        <button type="submit" class="btn btn-light">Update</button>
+      </div>
+    </form>
 
-  <td>
-    <form method="POST" action="/urls/<%=shortURL%>/edit">
-    <button type="submit" class="btn btn-secondary">Edit</button></form>
-  </td>
-  </tr>
-
-  </table>
   <br>
+
   <h6><a href="/urls">View All Shorties</a></h6>
 </body>
 
 </html>
+
+<!-- <td style="padding: 10px 10px 10px 0px;"><a href="<%= longURL %>"><%= longURL %></a></td> -->
