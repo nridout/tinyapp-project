@@ -112,17 +112,35 @@ app.get("/login", (req, res) => {
 
 // creates a cookie when the user enters username
 app.post("/login", (req, res) => {
-  let username = req.body.username
-  res.cookie("user_id", username)
-  res.redirect("/urls")
+  const checkEmail = found(req.body.email)
+  const user_id = correctPassword(req.body.password, req.body.email)
+
+  if (!checkEmail) {
+    return res.status(403).json({ message: 'User not found' })
+  } else if (!user_id) {
+    return res.status(403).json({ message: 'Password incorrect' })
+  } else {
+    res.cookie("user_id", user_id)
+    res.redirect("/urls")
+  }
 })
+
+// If correct password, return user id
+const correctPassword = (inputPassword, inputEmail)  => {
+  for (id in users) {
+    if (users[id].email === inputEmail && users[id].password === inputPassword) {
+      return users[id].id
+    }
+  }
+}
+
 
 // --- LOGOUT
 
 // deletes user cookie when user logs out
 app.post("/logout", (req, res) => {
-  let username = req.body.username
-  res.clearCookie("user_id", username)
+  let user_id = req.body.user_id
+  res.clearCookie("user_id", user_id)
   res.redirect("/urls")
 })
 
