@@ -53,8 +53,9 @@ app.get("/", (req, res) => {
 
 // template for the register page
 app.get("/register", (req, res) => {
+  let user = users[0]
   let templateVars = {
-    username: req.cookies["username"]
+    username: req.cookies[users]
   }
   res.render("urls_register", templateVars)
 })
@@ -67,12 +68,26 @@ app.post("/register", (req, res) => {
   let id = generateRandomString()
   let email = req.body.email
   let password = req.body.password
+  const found = function(email) {
+    for (id in users) {
+      if (id.email === email) {
+        return true;
+      }
+    }
+  }
+  if (email === "" || password === "" ) {
+    return res.status(400).send("Please fill out all the required information")
+  } else if (found) {
+    return res.status(404).send("This email already exists")
+  } else {
   users[id] = {
     id: id,
     email: email,
     password: password
   }
-  res.cookie("username", id)
+}
+  console.log(users)
+  res.cookie("user_id", id)
   res.redirect("/urls")
 })
 
@@ -82,7 +97,7 @@ app.post("/register", (req, res) => {
 // creates a cookie when the user enters username
 app.post("/login", (req, res) => {
   let username = req.body.username
-  res.cookie("username", username)
+  res.cookie("user_id", username)
   res.redirect("/urls")
 })
 
@@ -91,7 +106,7 @@ app.post("/login", (req, res) => {
 // deletes user cookie when user logs out
 app.post("/logout", (req, res) => {
   let username = req.body.username
-  res.clearCookie("username", username)
+  res.clearCookie("user_id", username)
   res.redirect("/urls")
 })
 
@@ -101,7 +116,7 @@ app.post("/logout", (req, res) => {
 // exports the database info to the template
 app.get("/urls", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"],
+    username: req.cookies["user_id"],
     urls: urlDatabase
   }
   res.render("urls_index", templateVars)
@@ -129,7 +144,7 @@ function generateRandomString() {
 // sets the template for the short URL generation page
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"]
+    username: req.cookies["user_id"]
   }
   res.render("urls_new", templateVars)
 })
@@ -139,7 +154,7 @@ app.get("/urls/new", (req, res) => {
 // sets the template for the unique id short URL page
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"],
+    username: req.cookies["user_id"],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]
   }
