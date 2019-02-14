@@ -110,7 +110,7 @@ app.get("/login", (req, res) => {
   res.render("urls_login", templateVars)
 })
 
-// creates a cookie when the user enters username
+// %#%%%%%%%%%%%%%%% re-comment
 app.post("/login", (req, res) => {
   const checkEmail = found(req.body.email)
   const user_id = correctPassword(req.body.password, req.body.email)
