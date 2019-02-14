@@ -26,8 +26,27 @@ app.use(cookieParser())
 
 // ROUTES
 
+// --- REGISTER
+
+// sets the template for the register page
+app.get("/register", (req, res) => {
+  let templateVars = {
+    username: req.cookies["username"]
+  }
+  res.render("urls_register", templateVars)
+})
+
+//
+app.post("/register", (req, res) => {
+  let username = req.body.username
+  res.cookie("username", username)
+  res.redirect("/urls")
+})
+
+
 // --- LOGIN
 
+// creates a cookie when the user enters username
 app.post("/login", (req, res) => {
   let username = req.body.username
   res.cookie("username", username)
@@ -36,6 +55,7 @@ app.post("/login", (req, res) => {
 
 // --- LOGOUT
 
+// deletes user cookie when user logs out
 app.post("/logout", (req, res) => {
   let username = req.body.username
   res.clearCookie("username", username)
