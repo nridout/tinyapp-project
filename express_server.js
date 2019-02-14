@@ -3,6 +3,7 @@ const express = require("express")
 const bodyParser = require("body-parser")
 const cookieParser = require('cookie-parser')
 const app = express()
+const bcrypt = require('bcrypt');
 const PORT = 3000 // default port 3000 because 8080 isn't working for me
 
 
@@ -91,6 +92,7 @@ app.post("/register", (req, res) => {
   const id = generateRandomString() // Generates a random user id
   const email = req.body.email
   const password = req.body.password
+  const hashedPassword = bcrypt.hashSync(password, 10);
   // Checks that the user has submitted an email & password
   if (email === "" || password === "" ) {
     return res.status(400).json({ message: 'Contact name is required' })
@@ -102,7 +104,7 @@ app.post("/register", (req, res) => {
     users[id] = {
       id: id,
       email: email,
-      password: password
+      password: hashedPassword
     }
   }
   // Sets the user id cookie to the user id
@@ -132,8 +134,11 @@ app.get("/login", (req, res) => {
 
 // Handles the Login Submission
 app.post("/login", (req, res) => {
+  const email = req.body.email
   const checkEmail = found(req.body.email)
-  const user_id = correctPassword(req.body.password, req.body.email)
+  const password = req.body.password
+  const user_id = correctPassword(password, email)
+
   // Checks that the email does exist in the user db
   if (!checkEmail) {
     return res.status(403).json({ message: 'User not found' })
@@ -143,7 +148,6 @@ app.post("/login", (req, res) => {
   // sets the cookie to the user_id & redirects to urls page
   } else {
     userURLdatabase = urlsForUser(user_id)
-    console.log (userURLdatabase)
     res.cookie("user_id", user_id)
     res.redirect("/urls")
   }
@@ -152,8 +156,9 @@ app.post("/login", (req, res) => {
 // Checks that the UserID & Password Match
 // If they match, returns the user id
 const correctPassword = (inputPassword, inputEmail)  => {
+  let passwordsMatch = bcrypt.compareSync(inputPassword, users[id].password)
   for (id in users) {
-    if (users[id].email === inputEmail && users[id].password === inputPassword) {
+    if (users[id].email === inputEmail && passwordsMatch) {
       return users[id].id
     }
   }
@@ -164,7 +169,6 @@ const correctPassword = (inputPassword, inputEmail)  => {
 // deletes user cookie when user logs out
 app.post("/logout", (req, res) => {
   let user_id = req.body.user_id
-  userURLdatabase = {}
   res.clearCookie("user_id", user_id)
   res.redirect("/urls")
 })
@@ -209,7 +213,12 @@ const urlsForUser = user_id => {
 app.post("/urls", (req, res) => {
   let randomString = generateRandomString()
   let longURL = req.body.longURL
+  let user_id = req.cookies["user_id"]
   userURLdatabase[randomString] = longURL
+  urlDatabase[randomString] = {
+    'longURL': longURL,
+    'userID' : user_id
+  }
   var redirectRandom = "/urls/" + randomString
   res.redirect(redirectRandom)
 })
@@ -264,6 +273,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     return res.status(401).json({ message: 'Request Denied, please log in to delete your link' })
   } else {
   delete (userURLdatabase[shortURL])
+    delete (urlDatabase[shortURL])
   res.redirect("/urls")
   }
 })
@@ -280,9 +290,14 @@ const userOwnsURL = userShortURL => {
 
 // reassigns shorty to a new url
 app.post("/urls/:id", (req, res) => {
-    let shortURL = req.params.id
-    let longURL = req.body.longURL
-    userURLdatabase[shortURL] = longURL
+  let user_id = req.cookies["user_id"]
+  let shortURL = req.params.id
+  let longURL = req.body.longURL
+  userURLdatabase[shortURL] = longURL
+  urlDatabase[shortURL] = {
+    'longURL': longURL,
+    'userID': user_id
+  }
     res.redirect(shortURL)
 });
 
