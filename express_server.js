@@ -179,7 +179,7 @@ function generateRandomString() {
 
 // sets the template for the short URL generation page
 app.get("/urls/new", (req, res) => {
-  // only registered & logged in users can view
+  // Check if the user is registered & logged in
   if (!req.cookies["user_id"]) {
     // redirect unregistered users to login page
     res.redirect("/login")
