@@ -68,16 +68,9 @@ app.post("/register", (req, res) => {
   let id = generateRandomString()
   let email = req.body.email
   let password = req.body.password
-  const found = function(email) {
-    for (id in users) {
-      if (id.email === email) {
-        return true;
-      }
-    }
-  }
   if (email === "" || password === "" ) {
     return res.status(400).send("Please fill out all the required information")
-  } else if (found) {
+  } else if (found(email)) {
     return res.status(404).send("This email already exists")
   } else {
   users[id] = {
@@ -91,8 +84,25 @@ app.post("/register", (req, res) => {
   res.redirect("/urls")
 })
 
+// function that checks for email
+const found = function (inputEmail) {
+  for (id in users) {
+    if (users[id].email === inputEmail) {
+      return true
+    }
+  }
+}
 
 // --- LOGIN
+
+// template for the register page
+app.get("/login", (req, res) => {
+  let user = users[0]
+  let templateVars = {
+    username: req.cookies[users]
+  }
+  res.render("urls_register", templateVars)
+})
 
 // creates a cookie when the user enters username
 app.post("/login", (req, res) => {
