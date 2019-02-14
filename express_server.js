@@ -102,12 +102,12 @@ const found = inputEmail => {
 
 // --- LOGIN
 
-// template for the register page
+// template for the login page
 app.get("/login", (req, res) => {
   let templateVars = {
     userInfo: users[req.cookies["user_id"]]
   }
-  res.render("urls_register", templateVars)
+  res.render("urls_login", templateVars)
 })
 
 // creates a cookie when the user enters username
