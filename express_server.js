@@ -110,22 +110,25 @@ app.get("/login", (req, res) => {
   res.render("urls_login", templateVars)
 })
 
-// %#%%%%%%%%%%%%%%% re-comment
+// Handles the Login Submission
 app.post("/login", (req, res) => {
   const checkEmail = found(req.body.email)
   const user_id = correctPassword(req.body.password, req.body.email)
-
+  // Checks that the email does exist in the user db
   if (!checkEmail) {
     return res.status(403).json({ message: 'User not found' })
+  // Checks that the email & password match
   } else if (!user_id) {
     return res.status(403).json({ message: 'Password incorrect' })
+  // sets the cookie to the user_id & redirects to urls page
   } else {
     res.cookie("user_id", user_id)
     res.redirect("/urls")
   }
 })
 
-// If correct password, return user id
+// Checks that the UserID & Password Match
+// If they match, returns the user id
 const correctPassword = (inputPassword, inputEmail)  => {
   for (id in users) {
     if (users[id].email === inputEmail && users[id].password === inputPassword) {
@@ -133,7 +136,6 @@ const correctPassword = (inputPassword, inputEmail)  => {
     }
   }
 }
-
 
 // --- LOGOUT
 
@@ -177,10 +179,17 @@ function generateRandomString() {
 
 // sets the template for the short URL generation page
 app.get("/urls/new", (req, res) => {
-  let templateVars = {
-    userInfo: users[req.cookies["user_id"]]
+  // only registered & logged in users can view
+  if (!req.cookies["user_id"]) {
+    // redirect unregistered users to login page
+    res.redirect("/login")
+  } else {
+    let templateVars = {
+      userInfo: users[req.cookies["user_id"]]
+    }
+    res.render("urls_new", templateVars)
   }
-  res.render("urls_new", templateVars)
+
 })
 
 // ---URL ID PAGE
