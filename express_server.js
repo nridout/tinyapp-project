@@ -22,10 +22,27 @@ app.use(cookieParser())
 // ** DATABASES **
 
 // URL Database
-var urlDatabase = {
-  '4cef9b': 'http://www.lighthouselabs.ca',
-  '5ce85d': 'http://www.test.ca',
-  '1a4aa5': 'http://www.google.ca',
+const urlDatabase = {
+  '4cef9b': {
+    longURL: 'http://www.lighthouselabs.ca',
+    userID: "userRandomID"
+  },
+  '5ce85d': {
+    longURL: 'http://www.test.ca',
+    userID: "user2RandomID"
+  },
+  '1a4aa5': {
+    longURL: 'http://www.google.ca',
+    userID: "ambellina23"
+  },
+  '1a4asd': {
+    longURL: 'http://www.testsite.ca',
+    userID: "ambellina23"
+  },
+  '4ceseb': {
+    longURL: 'http://www.lighthouse.ca',
+    userID: "userRandomID"
+  },
 }
 
 // User Database
@@ -33,7 +50,7 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: "purple"
   },
   "user2RandomID": {
     id: "user2RandomID",
@@ -46,6 +63,9 @@ const users = {
     password: "password"
   },
 }
+
+// UserURLS
+var userURLdatabase = {}
 
 // ---ROOT HOMEPAGE
 
@@ -122,6 +142,8 @@ app.post("/login", (req, res) => {
     return res.status(403).json({ message: 'Password incorrect' })
   // sets the cookie to the user_id & redirects to urls page
   } else {
+    userURLdatabase = urlsForUser(user_id)
+    console.log (userURLdatabase)
     res.cookie("user_id", user_id)
     res.redirect("/urls")
   }
@@ -142,6 +164,7 @@ const correctPassword = (inputPassword, inputEmail)  => {
 // deletes user cookie when user logs out
 app.post("/logout", (req, res) => {
   let user_id = req.body.user_id
+  userURLdatabase = {}
   res.clearCookie("user_id", user_id)
   res.redirect("/urls")
 })
@@ -151,12 +174,33 @@ app.post("/logout", (req, res) => {
 // sets the template for the list of all long & short urls
 // exports the database info to the template
 app.get("/urls", (req, res) => {
-  let templateVars = {
-    userInfo: users[req.cookies["user_id"]],
-    urls: urlDatabase
+
+  // Check if the user is registered & logged in
+  if (!req.cookies["user_id"]) {
+    // redirect unregistered users to login page
+    res.redirect("/login")
+  } else {
+    let userInfo = users[req.cookies["user_id"]]
+    // let user_id = req.cookies["user_id"]
+    let urls = userURLdatabase
+    let templateVars = {
+      userInfo: userInfo,
+      urls: urls
+    }
+    res.render("urls_index", templateVars)
   }
-  res.render("urls_index", templateVars)
 })
+
+// filters the urlDatabase by user id
+const urlsForUser = user_id => {
+  const userURLs = {}
+  for (shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === user_id) {
+      userURLs[shortURL] = urlDatabase[shortURL].longURL
+    }
+  }
+  return userURLs
+}
 
 // collects the input from the "long URL" form
 // assigns a random string to the short URL
@@ -165,7 +209,7 @@ app.get("/urls", (req, res) => {
 app.post("/urls", (req, res) => {
   let randomString = generateRandomString()
   let longURL = req.body.longURL
-  urlDatabase[randomString] = longURL
+  userURLdatabase[randomString] = longURL
   var redirectRandom = "/urls/" + randomString
   res.redirect(redirectRandom)
 })
@@ -196,26 +240,50 @@ app.get("/urls/new", (req, res) => {
 
 // sets the template for the unique id short URL page
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = {
-    userInfo: users[req.cookies["user_id"]],
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL]
+  shortURL = req.params.shortURL
+  // Check if the user is registered & logged in & has url in userdb
+  if (!req.cookies["user_id"] || !userOwnsURL(shortURL)) {
+    // redirect unregistered users to login page
+    return res.status(401).json({ message: 'Request Denied, please log in to delete your link' })
+  } else {
+    let templateVars = {
+      userInfo: users[req.cookies["user_id"]],
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL],
+      urls: userURLdatabase
+    }
+    res.render("urls_show", templateVars)
   }
-  res.render("urls_show", templateVars)
 })
 
 // deletes short urls
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete(urlDatabase[req.params.shortURL])
+  let shortURL = req.params.shortURL
+  // Check if the user is registered & logged in & has url in userdb
+  if (!req.cookies["user_id"] && !userOwnsURL(shortURL)) {
+    return res.status(401).json({ message: 'Request Denied, please log in to delete your link' })
+  } else {
+  delete (userURLdatabase[shortURL])
   res.redirect("/urls")
+  }
 })
+
+//checks if shortURL is in user DB
+// filters the urlDatabase by user id
+const userOwnsURL = userShortURL => {
+  for (shortURL in userURLdatabase) {
+    if (shortURL === userShortURL) {
+      return true
+    }
+  }
+}
 
 // reassigns shorty to a new url
 app.post("/urls/:id", (req, res) => {
-  let shortURL = req.params.id
-  let longURL = req.body.longURL
-  urlDatabase[shortURL] = longURL
-  res.redirect(shortURL)
+    let shortURL = req.params.id
+    let longURL = req.body.longURL
+    userURLdatabase[shortURL] = longURL
+    res.redirect(shortURL)
 });
 
 // ---SHORT URL REDIRECT
@@ -223,7 +291,7 @@ app.post("/urls/:id", (req, res) => {
 // redirects the long URL to the short URL
 // when the unique key is added to the /u/ path
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL]["longURL"];
   res.redirect(longURL)
 })
 
