@@ -20,8 +20,8 @@
         <a class="nav-link" href="/register">Register</a>
       </li>
     </ul>
-  <% if ( username !== undefined ) { %>
-  <h4><small class="text-info">Logged in as: <%=username%></small></h4>
+  <% if ( userInfo !== undefined ) { %>
+  <h4><small class="text-info">Logged in as: <%=userInfo.email%></small></h4>
   <form method="POST" action="/logout">
   <button class="btn btn-outline-primary my-2 my-sm-0 ml-3" type="submit">Logout</button>
   </form>

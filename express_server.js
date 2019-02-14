@@ -1,4 +1,4 @@
-// import express, the web application framework
+// Required modules
 const express = require("express")
 const bodyParser = require("body-parser")
 const cookieParser = require('cookie-parser')
@@ -6,7 +6,7 @@ const app = express()
 const PORT = 3000 // default port 3000 because 8080 isn't working for me
 
 
-// sets the view engine to ejs, a templating language that generates HTML markup with plain JavaScript
+// Sets the view engine to ejs
 app.set("view engine", "ejs")
 
 // MIDDLEWARE
@@ -39,7 +39,12 @@ const users = {
     id: "user2RandomID",
     email: "user2@example.com",
     password: "dishwasher-funk"
-  }
+  },
+  "ambellina23": {
+    id: "ambellina23",
+    email: "nicole.ridout@gmail.com",
+    password: "password"
+  },
 }
 
 // ---ROOT HOMEPAGE
@@ -53,39 +58,41 @@ app.get("/", (req, res) => {
 
 // template for the register page
 app.get("/register", (req, res) => {
-  let user = users[0]
+
   let templateVars = {
-    username: req.cookies[users]
+    userInfo: users[req.cookies["user_id"]]
   }
+
   res.render("urls_register", templateVars)
 })
 
-// handles registration submission
-// creates new user in the user database & generates random user id
-// sets user id cookie
-// redirects to the urls page
+// Handles Registration Submission
 app.post("/register", (req, res) => {
-  let id = generateRandomString()
-  let email = req.body.email
-  let password = req.body.password
+  const id = generateRandomString() // Generates a random user id
+  const email = req.body.email
+  const password = req.body.password
+  // Checks that the user has submitted an email & password
   if (email === "" || password === "" ) {
-    return res.status(400).send("Please fill out all the required information")
+    return res.status(400).json({ message: 'Contact name is required' })
+  // Checks that the user email is not already in the database
   } else if (found(email)) {
-    return res.status(404).send("This email already exists")
+    return res.status(404).json({ message: 'This email already exists' })
+  // If both conditions met, creates new user in the user database
   } else {
-  users[id] = {
-    id: id,
-    email: email,
-    password: password
+    users[id] = {
+      id: id,
+      email: email,
+      password: password
+    }
   }
-}
-  console.log(users)
+  // Sets the user id cookie to the user id
   res.cookie("user_id", id)
+  // Redirects user to the urls page
   res.redirect("/urls")
 })
 
-// function that checks for email
-const found = function (inputEmail) {
+// Checks if email is already in the user database
+const found = inputEmail => {
   for (id in users) {
     if (users[id].email === inputEmail) {
       return true
@@ -97,9 +104,8 @@ const found = function (inputEmail) {
 
 // template for the register page
 app.get("/login", (req, res) => {
-  let user = users[0]
   let templateVars = {
-    username: req.cookies[users]
+    userInfo: users[req.cookies["user_id"]]
   }
   res.render("urls_register", templateVars)
 })
@@ -126,7 +132,7 @@ app.post("/logout", (req, res) => {
 // exports the database info to the template
 app.get("/urls", (req, res) => {
   let templateVars = {
-    username: req.cookies["user_id"],
+    userInfo: users[req.cookies["user_id"]],
     urls: urlDatabase
   }
   res.render("urls_index", templateVars)
@@ -154,7 +160,7 @@ function generateRandomString() {
 // sets the template for the short URL generation page
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    username: req.cookies["user_id"]
+    userInfo: users[req.cookies["user_id"]]
   }
   res.render("urls_new", templateVars)
 })
@@ -164,7 +170,7 @@ app.get("/urls/new", (req, res) => {
 // sets the template for the unique id short URL page
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
-    username: req.cookies["user_id"],
+    userInfo: users[req.cookies["user_id"]],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]
   }
