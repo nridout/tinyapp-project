@@ -9,13 +9,6 @@ const PORT = 3000 // default port 3000 because 8080 isn't working for me
 // sets the view engine to ejs, a templating language that generates HTML markup with plain JavaScript
 app.set("view engine", "ejs")
 
-// url Database including original url and shortened url key
-var urlDatabase = {
-  '4cef9b': 'http://www.lighthouselabs.ca',
-  '5ce85d': 'http://www.test.ca',
-  '1a4aa5': 'http://www.google.ca',
-}
-
 // MIDDLEWARE
 
 // formats the response from the original url submission
@@ -26,9 +19,39 @@ app.use(cookieParser())
 
 // ROUTES
 
+// ** DATABASES **
+
+// URL Database
+var urlDatabase = {
+  '4cef9b': 'http://www.lighthouselabs.ca',
+  '5ce85d': 'http://www.test.ca',
+  '1a4aa5': 'http://www.google.ca',
+}
+
+// User Database
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
+
+// ---ROOT HOMEPAGE
+
+// sets the template for the root (homepage)
+app.get("/", (req, res) => {
+  res.redirect("/urls/new")
+})
+
 // --- REGISTER
 
-// sets the template for the register page
+// template for the register page
 app.get("/register", (req, res) => {
   let templateVars = {
     username: req.cookies["username"]
@@ -36,10 +59,20 @@ app.get("/register", (req, res) => {
   res.render("urls_register", templateVars)
 })
 
-//
+// handles registration submission
+// creates new user in the user database & generates random user id
+// sets user id cookie
+// redirects to the urls page
 app.post("/register", (req, res) => {
-  let username = req.body.username
-  res.cookie("username", username)
+  let id = generateRandomString()
+  let email = req.body.email
+  let password = req.body.password
+  users[id] = {
+    id: id,
+    email: email,
+    password: password
+  }
+  res.cookie("username", id)
   res.redirect("/urls")
 })
 
@@ -60,13 +93,6 @@ app.post("/logout", (req, res) => {
   let username = req.body.username
   res.clearCookie("username", username)
   res.redirect("/urls")
-})
-
-// ---ROOT HOMEPAGE
-
-// sets the template for the root (homepage)
-app.get("/", (req, res) => {
-  res.redirect("/urls/new")
 })
 
 // ---URL LIST
