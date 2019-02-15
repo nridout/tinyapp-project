@@ -21,57 +21,16 @@ app.use(cookieSession({
   keys: ["13534626"],
 }))
 
-
-
 // ROUTES
 
 // ** DATABASES **
 
 // URL Database
-const urlDatabase = {
-  '4cef9b': {
-    longURL: 'http://www.lighthouselabs.ca',
-    userID: "userRandomID"
-  },
-  '5ce85d': {
-    longURL: 'http://www.test.ca',
-    userID: "user2RandomID"
-  },
-  '1a4aa5': {
-    longURL: 'http://www.google.ca',
-    userID: "ambellina23"
-  },
-  '1a4asd': {
-    longURL: 'http://www.testsite.ca',
-    userID: "ambellina23"
-  },
-  '4ceseb': {
-    longURL: 'http://www.lighthouse.ca',
-    userID: "userRandomID"
-  },
-}
+const urlDatabase = {}
 
 // User Database
-const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple"
-  },
-  "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
-  },
-  "ambellina23": {
-    id: "ambellina23",
-    email: "nicole.ridout@gmail.com",
-    password: "password"
-  },
-}
+const users = {}
 
-// UserURLS
-var userURLdatabase = {}
 
 // ---ROOT HOMEPAGE
 
@@ -156,7 +115,6 @@ app.post("/login", (req, res) => {
     return res.status(403).json({ message: 'Password incorrect' })
   // sets the cookie to the user_id & redirects to urls page
   } else {
-    userURLdatabase = urlsForUser(user_id)
     req.session.user_id = user_id
     res.redirect("/urls")
   }
@@ -177,12 +135,13 @@ const correctPassword = (inputPassword, inputEmail)  => {
 
 // deletes user cookie when user logs out
 app.post("/logout", (req, res) => {
+
   let user_id = req.body.user_id
   req.session = null
   res.redirect("/login")
 })
 
-// ---URL LIST
+// ---URL INDEX
 
 // sets the template for the list of all long & short urls
 // exports the database info to the template
@@ -194,12 +153,14 @@ app.get("/urls", (req, res) => {
     res.redirect("/login")
   } else {
     let userInfo = users[req.session.user_id]
-    let user_id = req.session.user_id
-    let urls = userURLdatabase
+    // let user_id = req.session.user_id
+    let userURLdatabase = urlsForUser(req.session.user_id) //userURLdatabase
     let templateVars = {
       userInfo: userInfo,
-      urls: urls
+      urls: userURLdatabase
     }
+
+    console.log(userURLdatabase)
     res.render("urls_index", templateVars)
   }
 })
@@ -215,6 +176,18 @@ const urlsForUser = user_id => {
   return userURLs
 }
 
+//checks if shortURL is in user DB
+// filters the urlDatabase by user id
+const userOwnsURL = function (userShortURL, user_id) {
+  let userURLdatabase = urlsForUser(user_id)
+  for (shortURL in userURLdatabase) {
+    if (shortURL === userShortURL) {
+      return true
+    }
+  }
+}
+
+
 // collects the input from the "long URL" form
 // assigns a random string to the short URL
 // generates a unique id page for the short URL
@@ -223,7 +196,6 @@ app.post("/urls", (req, res) => {
   let randomString = generateRandomString()
   let longURL = req.body.longURL
   let user_id = req.session.user_id
-  userURLdatabase[randomString] = longURL
   urlDatabase[randomString] = {
     'longURL': longURL,
     'userID' : user_id
@@ -260,17 +232,17 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   shortURL = req.params.shortURL
   // Check if the user is registered & logged in & has url in userdb
-  if (!req.session.user_id || !userOwnsURL(shortURL)) {
+  if (!req.session.user_id || !userOwnsURL(shortURL, req.session.user_id)) {
     // redirect unregistered users to login page
     return res.status(401).json({ message: 'Request Denied, please log in to delete your link' })
   } else {
     let templateVars = {
       userInfo: users[req.session.user_id],
       shortURL: req.params.shortURL,
-      longURL: urlDatabase[req.params.shortURL],
-      urls: userURLdatabase
+      longURL: urlDatabase[req.params.shortURL].longURL,
     }
     res.render("urls_show", templateVars)
+    console.log(longURL)
   }
 })
 
@@ -281,28 +253,18 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   if (!req.session.user_id && !userOwnsURL(shortURL)) {
     return res.status(401).json({ message: 'Request Denied, please log in to delete your link' })
   } else {
-  delete (userURLdatabase[shortURL])
     delete (urlDatabase[shortURL])
   res.redirect("/urls")
   }
 })
 
-//checks if shortURL is in user DB
-// filters the urlDatabase by user id
-const userOwnsURL = userShortURL => {
-  for (shortURL in userURLdatabase) {
-    if (shortURL === userShortURL) {
-      return true
-    }
-  }
-}
+
 
 // reassigns shorty to a new url
 app.post("/urls/:id", (req, res) => {
   let user_id = req.session.user_id
   let shortURL = req.params.id
   let longURL = req.body.longURL
-  userURLdatabase[shortURL] = longURL
   urlDatabase[shortURL] = {
     'longURL': longURL,
     'userID': user_id
