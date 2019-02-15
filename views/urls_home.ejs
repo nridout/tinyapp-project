@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>TinyApp - Create New TinyURL</title>
+
+  <!-- Bootstrap CSS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+    integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.bundle.min.js"
+    type="text/javascript"></script>
+
+  <!-- Additional CSS -->
+  <style id="compiled-css" type="text/css">
+    .masthead {
+      height: 100vh;
+      min-height: 500px;
+      background-image: url('http://www.nicoleridout.com/img/tiles.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+    .jumbotron {
+      background: rgba(230, 230, 230, 0.80);
+      padding: 2rem 2rem;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <% include partials/_header %>
+
+<!-- Full Page Image Header with Vertically Centered Content -->
+<header class="masthead">
+  <div class="container h-100 d-flex justify-content-center">
+    <div class="jumbotron my-auto">
+        <h1 class="display-2 text-center"><strong>Shrink Me</strong> </h1>
+        <p class="lead text-center"> Shrink links to fit more in your tweets & grow your audience
+      <form class="form-inline" action="/urls" method="POST">
+          <input class="form-control" type="text" name="longURL" placeholder="http://"
+            style="width: 475px; margin: 1em">
+          <% if ( userInfo !== undefined ) { %>
+          <button type="submit" class="btn btn-primary">Shrink</button>
+          <% } else { %>
+          <a class="btn btn-primary" href="/login" role="button">Shrink</a>
+          <% }; %>
+      </form>
+      <p class="lead text-center ">`What a curious feeling!' said Alice; `I must be shutting up like a telescope.'</p>
+      <p class="text-center" style="margin: 1em"><a href="/login">Login</a> | <a href="/register">Register</a></p>
+    </div>
+  </div>
+</header>
+
+<!-- Page Content -->
+<section class="py-5">
+  <div class="container">
+    <h2 class="font-weight-light">Would you tell me, please, which way I ought to go from here?</h2>
+    <br />
+    <p>Would you tell me, please, which way I ought to go from here?
+      “That depends a good deal on where you want to get to,” said the Cat.
+      “I don’t much care where—” said Alice.
+      “Then it doesn’t matter which way you go,” said the Cat.
+      “—so long as I get somewhere,” Alice added as an explanation.
+      “Oh, you’re sure to do that,” said the Cat, “if you only walk long enough.” <footer class="blockquote-footer">
+        Chapter 6, <cite title="Source Title">Pig and Pepper</cite></footer>
+  </div>
+</section>
+
+
+

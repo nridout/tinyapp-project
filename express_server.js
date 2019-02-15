@@ -77,7 +77,12 @@ var userURLdatabase = {}
 
 // sets the template for the root (homepage)
 app.get("/", (req, res) => {
-  res.redirect("/urls/new")
+
+  let templateVars = {
+    userInfo: users[req.session.user_id]
+  }
+
+  res.render("urls_home", templateVars)
 })
 
 // --- REGISTER
