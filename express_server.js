@@ -1,7 +1,7 @@
 // Required modules
 const express = require("express")
 const bodyParser = require("body-parser")
-const cookieParser = require('cookie-parser')
+var cookieSession = require('cookie-session')
 const app = express()
 const bcrypt = require('bcrypt');
 const PORT = 3000 // default port 3000 because 8080 isn't working for me
@@ -16,7 +16,12 @@ app.set("view engine", "ejs")
 app.use(bodyParser.urlencoded({ extended: true }))
 
 // Parse Cookie header and populate req.cookies with an object keyed by the cookie names
-app.use(cookieParser())
+app.use(cookieSession({
+  name: 'session',
+  keys: ["13534626"],
+}))
+
+
 
 // ROUTES
 
@@ -81,7 +86,7 @@ app.get("/", (req, res) => {
 app.get("/register", (req, res) => {
 
   let templateVars = {
-    userInfo: users[req.cookies["user_id"]]
+    userInfo: users[req.session.user_id]
   }
 
   res.render("urls_register", templateVars)
@@ -108,7 +113,7 @@ app.post("/register", (req, res) => {
     }
   }
   // Sets the user id cookie to the user id
-  res.cookie("user_id", id)
+  req.session.user_id = id
   // Redirects user to the urls page
   res.redirect("/urls")
 })
@@ -127,7 +132,7 @@ const found = inputEmail => {
 // template for the login page
 app.get("/login", (req, res) => {
   let templateVars = {
-    userInfo: users[req.cookies["user_id"]]
+    userInfo: users[req.session.user_id]
   }
   res.render("urls_login", templateVars)
 })
@@ -137,8 +142,7 @@ app.post("/login", (req, res) => {
   const email = req.body.email
   const checkEmail = found(req.body.email)
   const password = req.body.password
-  const user_id = correctPassword(password, email)
-
+  let user_id = correctPassword(password, email)
   // Checks that the email does exist in the user db
   if (!checkEmail) {
     return res.status(403).json({ message: 'User not found' })
@@ -148,7 +152,7 @@ app.post("/login", (req, res) => {
   // sets the cookie to the user_id & redirects to urls page
   } else {
     userURLdatabase = urlsForUser(user_id)
-    res.cookie("user_id", user_id)
+    req.session.user_id = user_id
     res.redirect("/urls")
   }
 })
@@ -169,8 +173,8 @@ const correctPassword = (inputPassword, inputEmail)  => {
 // deletes user cookie when user logs out
 app.post("/logout", (req, res) => {
   let user_id = req.body.user_id
-  res.clearCookie("user_id", user_id)
-  res.redirect("/urls")
+  req.session = null
+  res.redirect("/login")
 })
 
 // ---URL LIST
@@ -178,14 +182,14 @@ app.post("/logout", (req, res) => {
 // sets the template for the list of all long & short urls
 // exports the database info to the template
 app.get("/urls", (req, res) => {
-
+  console.log(req.session.user_id)
   // Check if the user is registered & logged in
-  if (!req.cookies["user_id"]) {
+  if (!req.session.user_id) {
     // redirect unregistered users to login page
     res.redirect("/login")
   } else {
-    let userInfo = users[req.cookies["user_id"]]
-    // let user_id = req.cookies["user_id"]
+    let userInfo = users[req.session.user_id]
+    let user_id = req.session.user_id
     let urls = userURLdatabase
     let templateVars = {
       userInfo: userInfo,
@@ -213,7 +217,7 @@ const urlsForUser = user_id => {
 app.post("/urls", (req, res) => {
   let randomString = generateRandomString()
   let longURL = req.body.longURL
-  let user_id = req.cookies["user_id"]
+  let user_id = req.session.user_id
   userURLdatabase[randomString] = longURL
   urlDatabase[randomString] = {
     'longURL': longURL,
@@ -233,12 +237,12 @@ function generateRandomString() {
 // sets the template for the short URL generation page
 app.get("/urls/new", (req, res) => {
   // Check if the user is registered & logged in
-  if (!req.cookies["user_id"]) {
+  if (!req.session.user_id) {
     // redirect unregistered users to login page
     res.redirect("/login")
   } else {
     let templateVars = {
-      userInfo: users[req.cookies["user_id"]]
+      userInfo: users[req.session.user_id]
     }
     res.render("urls_new", templateVars)
   }
@@ -251,12 +255,12 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   shortURL = req.params.shortURL
   // Check if the user is registered & logged in & has url in userdb
-  if (!req.cookies["user_id"] || !userOwnsURL(shortURL)) {
+  if (!req.session.user_id || !userOwnsURL(shortURL)) {
     // redirect unregistered users to login page
     return res.status(401).json({ message: 'Request Denied, please log in to delete your link' })
   } else {
     let templateVars = {
-      userInfo: users[req.cookies["user_id"]],
+      userInfo: users[req.session.user_id],
       shortURL: req.params.shortURL,
       longURL: urlDatabase[req.params.shortURL],
       urls: userURLdatabase
@@ -269,7 +273,7 @@ app.get("/urls/:shortURL", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   let shortURL = req.params.shortURL
   // Check if the user is registered & logged in & has url in userdb
-  if (!req.cookies["user_id"] && !userOwnsURL(shortURL)) {
+  if (!req.session.user_id && !userOwnsURL(shortURL)) {
     return res.status(401).json({ message: 'Request Denied, please log in to delete your link' })
   } else {
   delete (userURLdatabase[shortURL])
@@ -290,7 +294,7 @@ const userOwnsURL = userShortURL => {
 
 // reassigns shorty to a new url
 app.post("/urls/:id", (req, res) => {
-  let user_id = req.cookies["user_id"]
+  let user_id = req.session.user_id
   let shortURL = req.params.id
   let longURL = req.body.longURL
   userURLdatabase[shortURL] = longURL
