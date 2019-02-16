@@ -1,14 +1,14 @@
 // MODULES
-const express = require("express");
-const bodyParser = require("body-parser");
-var cookieSession = require('cookie-session');
-const app = express();
-const bcrypt = require('bcrypt');
+const express = require("express")
+const bodyParser = require("body-parser")
+var cookieSession = require('cookie-session')
+const app = express()
+const bcrypt = require('bcrypt')
 const PORT = 3000 // default port 3000 because 8080 isn't working for me
 
 
 // EJS VIEW ENGINE
-app.set("view engine", "ejs");
+app.set("view engine", "ejs")
 
 // ---------------------------------------------------------------------------------- //
 
@@ -17,13 +17,13 @@ app.set("view engine", "ejs");
 // ---------------------------------------------------------------------------------- //
 
 // formats the response from the original url submission
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }))
 
 // Parse Cookie header and populate req.cookies with an object keyed by the cookie names
 app.use(cookieSession({
   name: 'session',
   keys: ["1353462werwr2323r6"],
-}));
+}))
 
 // ---------------------------------------------------------------------------------- //
 
@@ -33,11 +33,50 @@ app.use(cookieSession({
 
 // ** DATABASES **
 
+// ** DATABASES **
+
 // URL Database
-const urlDatabase = {};
+const urlDatabase = {
+  '4cef9b': {
+    longURL: 'http://www.lighthouselabs.ca',
+    userID: "userRandomID"
+  },
+  '5ce85d': {
+    longURL: 'http://www.test.ca',
+    userID: "user2RandomID"
+  },
+  '1a4aa5': {
+    longURL: 'http://www.google.ca',
+    userID: "ambellina23"
+  },
+  '1a4asd': {
+    longURL: 'http://www.testsite.ca',
+    userID: "ambellina23"
+  },
+  '4ceseb': {
+    longURL: 'http://www.lighthouse.ca',
+    userID: "userRandomID"
+  },
+}
 
 // User Database
-const users = {};
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  },
+  "ambellina23": {
+    id: "ambellina23",
+    email: "nicole.ridout@gmail.com",
+    password: "password"
+  },
+}
 
 
 // HOMEPAGE ---- /
@@ -48,8 +87,8 @@ app.get("/", (req, res) => {
   let templateVars = {
     userInfo: users[req.session.user_id]
   }
-  res.render("urls_home", templateVars);
-});
+  res.render("urls_home", templateVars)
+})
 
 
 
@@ -62,17 +101,19 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   // Check if the user is registered & logged in
   if (!req.session.user_id) {
-    // Redirect users not logged in to the Login page
-    res.redirect("/login");
+    // Return error message asking user to log in
+    return res
+      .status(401)
+      .send('Request Denied, please log in')
   } else {
-    let userInfo = users[req.session.user_id];
+    let userInfo = users[req.session.user_id]
     // Sets the user database with the user's custom URLs
-    let userURLdatabase = urlsForUser(req.session.user_id);
+    let userURLdatabase = urlsForUser(req.session.user_id)
     let templateVars = {
       userInfo: userInfo,
       urls: userURLdatabase
-    };
-    res.render("urls_index", templateVars);
+    }
+    res.render("urls_index", templateVars)
   }
 })
 
@@ -109,6 +150,7 @@ app.post("/urls", (req, res) => {
   let randomString = generateRandomString()
   let longURL = req.body.longURL
   let user_id = req.session.user_id
+  // Adds the new custom url to the url Database
   urlDatabase[randomString] = {
     'longURL': longURL,
     'userID' : user_id
@@ -131,8 +173,10 @@ function generateRandomString() {
 app.get("/urls/new", (req, res) => {
   // Check if the user is logged in
   if (!req.session.user_id) {
-    // Redirect users not logged in to the Login page
-    res.redirect("/login")
+    // Return error message asking user to log in
+    return res
+      .status(401)
+      .send('Request Denied, please log in')
   } else {
     let templateVars = {
       userInfo: users[req.session.user_id]
@@ -149,9 +193,9 @@ app.get("/urls/new", (req, res) => {
 // sets the template for the unique id short URL page
 app.get("/urls/:shortURL", (req, res) => {
   shortURL = req.params.shortURL
-  // Check if the user is registered & logged in & has url in userdb
+  // Check if the user is logged in & owns url for given id
   if (!req.session.user_id || !userOwnsURL(shortURL, req.session.user_id)) {
-    // redirect unregistered users to login page
+    // Return error message asking user to log in
     return res
     .status(401)
     .send( 'Request Denied, please log in' )
@@ -166,6 +210,7 @@ app.get("/urls/:shortURL", (req, res) => {
 })
 
 // -- POST -- //
+
 // deletes short urls
 app.post("/urls/:shortURL/delete", (req, res) => {
   let shortURL = req.params.shortURL
@@ -178,7 +223,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   }
 })
 
-// -- POST -- //
 // reassigns shorty to a new url
 app.post("/urls/:id", (req, res) => {
   let user_id = req.session.user_id
@@ -189,23 +233,45 @@ app.post("/urls/:id", (req, res) => {
     'userID': user_id
   }
     res.redirect(shortURL)
-});
+})
+
 
 // ---SHORT URL REDIRECT
 // ---------------------------------------------------------------------------------- //
 
 // -- GET -- //
+
 // redirects the long URL to the short URL
 // when the unique key is added to the /u/ path
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]["longURL"];
+  let shortURL = req.params.shortURL
+  if (!foundURL(shortURL)) {
+    // Return error message page does not exist
+    return res
+      .status(404)
+      .send('Page does not exist')
+  } else {
+  const longURL = urlDatabase[req.params.shortURL]["longURL"]
   res.redirect(longURL)
+  }
 })
+
+// -- FUNCTIONS -- //
+
+// Checks if url is in the url database
+const foundURL = inputURL => {
+  for (shortURL in urlDatabase) {
+    if (shortURL === inputURL) {
+      return true
+    }
+  }
+}
 
 // --- LOGIN
 // ---------------------------------------------------------------------------------- //
 
 // -- GET -- //
+
 // template for the login page
 app.get("/login", (req, res) => {
   let templateVars = {
@@ -235,24 +301,27 @@ app.post("/login", (req, res) => {
     req.session.user_id = user_id
     res.redirect("/urls")
   }
-  // Checks that the UserID & Password Match
-  // If they match, returns the user id
-  const correctPassword = (inputPassword, inputEmail) => {
-    let passwordsMatch = bcrypt.compareSync(inputPassword, users[id].password)
-    for (id in users) {
-      if (users[id].email === inputEmail && passwordsMatch) {
-        return users[id].id
-      }
-    }
-  }
 })
 
+// -- FUNCTIONS -- //
+
+// Checks that the UserID & Password Match
+// If they match, returns the user id
+const correctPassword = (inputPassword, inputEmail) => {
+  let passwordsMatch = bcrypt.compareSync(inputPassword, users[id].password)
+  for (id in users) {
+    if (users[id].email === inputEmail && passwordsMatch) {
+      return users[id].id
+    }
+  }
+}
 
 
 // REGISTER ----
 // ---------------------------------------------------------------------------------- //
 
 // -- GET -- //
+
 // Sets the template for the Register Page
 app.get("/register", (req, res) => {
   let templateVars = {
@@ -262,6 +331,7 @@ app.get("/register", (req, res) => {
 })
 
 // -- POST -- //
+
 // Handles Registration Submission
 app.post("/register", (req, res) => {
   // Generates a random user id
@@ -270,7 +340,7 @@ app.post("/register", (req, res) => {
   const email = req.body.email
   const password = req.body.password
   // Hashes password
-  const hashedPassword = bcrypt.hashSync(password, 10);
+  const hashedPassword = bcrypt.hashSync(password, 10)
 
   // Checks that the user has submitted an email & password
   if (email === "" || password === "") {
@@ -293,6 +363,8 @@ app.post("/register", (req, res) => {
   // Redirects user to the urls page
   res.redirect("/urls")
 })
+
+// -- FUNCTIONS -- //
 
 // Checks if email is already in the user database
 const found = inputEmail => {
