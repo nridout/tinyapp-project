@@ -4,7 +4,7 @@ const bodyParser = require("body-parser")
 var cookieSession = require('cookie-session')
 const app = express()
 const bcrypt = require('bcrypt')
-const PORT = 3000 // default port 3000 because 8080 isn't working for me
+const PORT = 3000 // default port 3000
 
 
 // EJS VIEW ENGINE
@@ -30,8 +30,6 @@ app.use(cookieSession({
 //                                      ROUTES
 
 // ---------------------------------------------------------------------------------- //
-
-// ** DATABASES **
 
 // ** DATABASES **
 
@@ -91,7 +89,6 @@ app.get("/", (req, res) => {
 })
 
 
-
 // USER URL INDEX ---- /urls
 // ---------------------------------------------------------------------------------- //
 
@@ -102,9 +99,7 @@ app.get("/urls", (req, res) => {
   // Check if the user is registered & logged in
   if (!req.session.user_id) {
     // Return error message asking user to log in
-    return res
-      .status(401)
-      .send('Request Denied, please log in')
+    return res.status(401).send('Request Denied, please log in')
   } else {
     let userInfo = users[req.session.user_id]
     // Sets the user database with the user's custom URLs
@@ -164,6 +159,7 @@ function generateRandomString() {
   return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1)
 }
 
+
 // CREATE NEW URL ---- /urls/new
 // ---------------------------------------------------------------------------------- //
 
@@ -174,9 +170,7 @@ app.get("/urls/new", (req, res) => {
   // Check if the user is logged in
   if (!req.session.user_id) {
     // Return error message asking user to log in
-    return res
-      .status(401)
-      .send('Request Denied, please log in')
+    return res.status(401).send('Request Denied, please log in')
   } else {
     let templateVars = {
       userInfo: users[req.session.user_id]
@@ -185,7 +179,8 @@ app.get("/urls/new", (req, res) => {
   }
 })
 
-// ---CUSTOM URL ID PAGE ---- /urls/:id
+
+// CUSTOM URL ID PAGE ---- /urls/:id
 // ---------------------------------------------------------------------------------- //
 
 // -- GET /urls/:id -- //
@@ -196,9 +191,7 @@ app.get("/urls/:shortURL", (req, res) => {
   // Check if the user is logged in & owns url for given id
   if (!req.session.user_id || !userOwnsURL(shortURL, req.session.user_id)) {
     // Return error message asking user to log in
-    return res
-    .status(401)
-    .send( 'Request Denied, please log in' )
+    return res.status(401).send( 'Request Denied, please log in' )
   } else {
     let templateVars = {
       userInfo: users[req.session.user_id],
@@ -209,47 +202,46 @@ app.get("/urls/:shortURL", (req, res) => {
   }
 })
 
-// -- POST -- //
+// -- POST /urls/:id -- //
 
-// deletes short urls
+// Deletes custom urls
 app.post("/urls/:shortURL/delete", (req, res) => {
   let shortURL = req.params.shortURL
-  // Check if the user is registered & logged in & has url in userdb
+  // Check if the user is logged in & has url in userdb
   if (!req.session.user_id && !userOwnsURL(shortURL)) {
-    return res.status(401).json({ message: 'Request Denied, please log in' })
+    return res.status(401).send ('Request Denied, please log in')
   } else {
     delete (urlDatabase[shortURL])
   res.redirect("/urls")
   }
 })
 
-// reassigns shorty to a new url
+// Reassigns custom url to new long url
 app.post("/urls/:id", (req, res) => {
   let user_id = req.session.user_id
   let shortURL = req.params.id
   let longURL = req.body.longURL
+  // Updates the database with the new long url
   urlDatabase[shortURL] = {
     'longURL': longURL,
     'userID': user_id
   }
-    res.redirect(shortURL)
+    // Redirects user back to the URL Index
+    res.redirect("/urls")
 })
 
 
-// ---SHORT URL REDIRECT
+// SHORT URL REDIRECT ---- /u/:id
 // ---------------------------------------------------------------------------------- //
 
-// -- GET -- //
+// -- GET /u/:id-- //
 
-// redirects the long URL to the short URL
-// when the unique key is added to the /u/ path
+// Redirects the long URL to the short URL
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL
   if (!foundURL(shortURL)) {
-    // Return error message page does not exist
-    return res
-      .status(404)
-      .send('Page does not exist')
+    // Return error message if page does not exist
+    return res.status(404).send('Page does not exist')
   } else {
   const longURL = urlDatabase[req.params.shortURL]["longURL"]
   res.redirect(longURL)
@@ -267,12 +259,13 @@ const foundURL = inputURL => {
   }
 }
 
-// --- LOGIN
+
+// LOGIN ---- /login
 // ---------------------------------------------------------------------------------- //
 
-// -- GET -- //
+// -- GET /login -- //
 
-// template for the login page
+// Sets template for the login page
 app.get("/login", (req, res) => {
   let templateVars = {
     userInfo: users[req.session.user_id]
@@ -280,7 +273,8 @@ app.get("/login", (req, res) => {
   res.render("urls_login", templateVars)
 })
 
-// -- POST -- //
+// -- POST /login -- //
+
 // Handles the Login Submission
 app.post("/login", (req, res) => {
   const email = req.body.email
@@ -296,7 +290,7 @@ app.post("/login", (req, res) => {
   } else if (!user_id) {
     return res.status(403).send('Password incorrect')
 
-    // sets the cookie to the user_id & redirects to urls page
+    // Sets the cookie to the user_id & redirects to urls page
   } else {
     req.session.user_id = user_id
     res.redirect("/urls")
@@ -317,10 +311,10 @@ const correctPassword = (inputPassword, inputEmail) => {
 }
 
 
-// REGISTER ----
+// REGISTER ---- /register
 // ---------------------------------------------------------------------------------- //
 
-// -- GET -- //
+// -- GET /register-- //
 
 // Sets the template for the Register Page
 app.get("/register", (req, res) => {
@@ -330,7 +324,7 @@ app.get("/register", (req, res) => {
   res.render("urls_register", templateVars)
 })
 
-// -- POST -- //
+// -- POST /register -- //
 
 // Handles Registration Submission
 app.post("/register", (req, res) => {
@@ -375,14 +369,18 @@ const found = inputEmail => {
   }
 }
 
-// LOGOUT ----
+
+// LOGOUT ---- /logout
 // ---------------------------------------------------------------------------------- //
 
-// handles logout - deletes session cookie
-app.post("/logout", (req, res) => {
+// -- POST /logout -- //
 
+// Handles logout
+app.post("/logout", (req, res) => {
+  // Deletes session cookie
   let user_id = req.body.user_id
   req.session = null
+  // Redirects to the login page
   res.redirect("/login")
 })
 
@@ -390,7 +388,7 @@ app.post("/logout", (req, res) => {
 // PORT LISTENER
 // ---------------------------------------------------------------------------------- //
 
-// console message indicating which port the server is running on
+// Console message indicating which port the server is running on
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`)
 })
