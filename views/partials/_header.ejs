@@ -1,17 +1,26 @@
-<!-- Navigation -->
+<!-- Navigation Bar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow fixed-top">
   <div class="container">
+
+    <!-- If the user is logged in, the "brand link" redirects to the Shrink a Link page -->
     <% if ( userInfo !== undefined ) { %>
-    <a class="navbar-brand" href="/urls/new">ShrinkMe</a>
+      <a class="navbar-brand" href="/urls/new">ShrinkMe</a>
+    <!-- If the user is not logged in, "brand link" redirects to a login splash page -->
     <% } else { %>
-    <a class="navbar-brand" href="/">ShrinkMe</a>
+      <a class="navbar-brand" href="/">ShrinkMe</a>
     <% }; %>
+
+    <!-- Sets the button for the responsive navigation ber -->
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
         aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
     </button>
+
+    <!-- Page Links -->
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav mr-auto">
+
+        <!-- if the user is logged in, Shrink A Link & My Links show in the nav bar -->
         <% if ( userInfo !== undefined ) { %>
         <li class="nav-item">
           <a class="nav-link" href="/urls/new">Shrink A Link</a>
@@ -30,6 +39,8 @@
           </form>
         </li>
       </ul>
+
+      <!-- if the user is not logged in, Login and Register links show in the nav bar -->
       <% } else { %>
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
@@ -40,8 +51,6 @@
         </li>
       </ul>
       <% }; %>
-        </li>
-      </ul>
     </div>
   </div>
 </nav>
