@@ -29,3 +29,4 @@ ShrinkMe is a full stack web application built with Node and Express that allows
 - Added a responsive Navigation Bar (in _header)
 - Added hover class to the table so the links are highlighted as the user
   browses the table
+- Links to external urls open in a new window
