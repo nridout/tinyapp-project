@@ -4,8 +4,10 @@ ShrinkMe is a full stack web application built with Node and Express that allows
 
 ## Final Product
 
-![&quot;screenshot description&quot;](#)
-![&quot;screenshot description&quot;](#)
+!["Screenshot of Homepage"](https://github.com/nridout/tinyapp-project/blob/5c1052fb3b2a0d90f946e99724fc28cd5ecec9cc/docs/home-page.png?raw=true)
+!["Screenshot of My Links Index"](https://github.com/nridout/tinyapp-project/blob/5c1052fb3b2a0d90f946e99724fc28cd5ecec9cc/docs/my-links-index.png?raw=true)
+!["Screenshot of My Links Edit"](https://github.com/nridout/tinyapp-project/blob/5c1052fb3b2a0d90f946e99724fc28cd5ecec9cc/docs/my-links-edit.png?raw=true)
+!["Screenshot of Shrink New Link"](https://github.com/nridout/tinyapp-project/blob/5c1052fb3b2a0d90f946e99724fc28cd5ecec9cc/docs/shrink-new-link.png?raw=true)
 
 ## Dependencies
 
