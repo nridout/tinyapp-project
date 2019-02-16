@@ -70,13 +70,13 @@
             <% for (shortURL in urls) { %>
             <tr>
               <td>
-                <a href="<%= urls[shortURL] %>"><%= urls[shortURL] %></a>
+                <a href="<%= urls[shortURL] %>" target="_blank"><%= urls[shortURL] %></a>
               </td>
               <td>
-                <a href="http://localhost:3000/u/<%= shortURL %>"><%= shortURL %></a>
+                <a href="/u/<%= shortURL %>" target="_blank"><%= shortURL %></a>
               </td>
               <td>
-                <a class="btn btn-block btn-light" style="float: right;" href="http://localhost:3000/urls/<%= shortURL %>" role="button">Edit</a>
+                <a class="btn btn-block btn-light" style="float: right;" href="/urls/<%= shortURL %>" role="button">Edit</a>
               </td>
               <td>
                 <form method="POST" action="/urls/<%=shortURL%>/delete">

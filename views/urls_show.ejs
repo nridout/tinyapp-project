@@ -56,7 +56,7 @@
         <h1 class="display-4"><strong>My Links</strong> </h1>
         <br>
         <!-- Shows the user's custom shortened URL, with the option to update the original URL  -->
-        <h3>TinyURL: <a href="http://localhost:3000/u/<%= shortURL %>"><%= shortURL %></a></h3>
+        <h3>TinyURL: <a href="/u/<%= shortURL %>" target="_blank"><%= shortURL %></a></h3>
         <form class="form-inline" action="/urls/<%= shortURL %>" method="POST">
           <div class="form-group mb-2">
             <input class="form-control" type="text" name="longURL" placeholder="<%= longURL %>" style="width: 300px; margin: 1em; margin-left: 0">
